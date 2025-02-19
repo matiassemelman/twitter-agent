@@ -1,99 +1,106 @@
-Documento de Requerimientos Funcionales y Diseño (RFD)
-1. Introducción
-El presente documento tiene como finalidad definir y estructurar los requerimientos funcionales y técnicos para la creación de un agente automatizado que revise los tweets de una cuenta específica y extraiga aquellos que contengan "consejos" relacionados con los IDEs Cursor y Windsurf. Este agente facilitará la recopilación y análisis de información relevante para usuarios interesados en tips y sugerencias sobre el uso de dichos entornos de desarrollo.
+# Functional Requirements and Design Document (RFD)
 
-2. Objetivos del Proyecto
-Extraer información: Conectar con la API de Twitter para acceder y extraer los tweets de una cuenta determinada.
-Filtrar contenido: Identificar y filtrar automáticamente aquellos tweets que incluyan consejos sobre el uso de los IDEs Cursor y Windsurf.
-Presentar resultados: Mostrar la información filtrada de forma clara y, opcionalmente, almacenarla para análisis posteriores.
-Automatización: Permitir la ejecución periódica del agente para mantener actualizada la información.
+## 1. Introduction
+This document aims to define and structure the functional and technical requirements for creating an automated agent that reviews tweets from a specific account and extracts those containing "advice" related to the Cursor and Windsurf IDEs. This agent will facilitate the collection and analysis of relevant information for users interested in tips and suggestions on using these development environments.
 
-3. Alcance del Proyecto
-Usuarios: El proyecto está dirigido a desarrolladores o equipos de soporte que requieran obtener de forma automatizada recomendaciones y tips relacionados con los IDEs mencionados.
-Funcionalidades:
-Conexión segura a la API de Twitter utilizando credenciales válidas.
-Extracción de un número configurable de tweets de la cuenta objetivo.
-Filtrado de tweets basado en palabras clave (p.ej., "cursor", "windsurf", "consejo").
-Presentación y/o almacenamiento de la información filtrada.
-Limitaciones:
-Restricciones de rate limit de la API de Twitter.
-Dependencia de la estructura y lenguaje utilizado en los tweets para el filtrado.
+## 2. Project Objectives
+- **Extract information**: Connect to the Twitter API to access and extract tweets from a specific account.
+- **Filter content**: Automatically identify and filter tweets that include advice on using the Cursor and Windsurf IDEs.
+- **Present results**: Display the filtered information clearly and optionally store it for further analysis.
+- **Automation**: Enable periodic execution of the agent to keep the information up to date.
 
-4. Requerimientos Funcionales
-4.1. Conexión y Autenticación
-RF1: El agente deberá autenticarse mediante las credenciales (API key, API secret, access token, access token secret) proporcionadas por Twitter Developer.
-RF2: Se deberá gestionar de forma segura el almacenamiento y uso de las credenciales.
+## 3. Project Scope
+**Users**: The project is aimed at developers or support teams who need to automatically obtain recommendations and tips related to the mentioned IDEs.
 
-4.2. Extracción de Tweets
-RF3: El sistema debe conectarse a la API de Twitter para extraer los últimos N tweets de la cuenta indicada.
-RF4: Se debe permitir configurar el número de tweets a extraer en cada ejecución.
+### Features:
+- Secure connection to the Twitter API using valid credentials.
+- Extraction of a configurable number of tweets from the target account.
+- Filtering tweets based on keywords (e.g., "cursor", "windsurf", "advice").
+- Presentation and/or storage of the filtered information.
 
-4.3. Filtrado y Procesamiento de Contenido
-RF5: El agente filtrará los tweets para identificar aquellos que contengan palabras clave específicas: "cursor", "windsurf" y "consejo" (considerando variaciones en mayúsculas/minúsculas y posibles sinónimos).
-RF6: Opcionalmente, implementar técnicas de Procesamiento de Lenguaje Natural (NLP) para mejorar la precisión en la identificación de consejos.
+### Limitations:
+- Twitter API rate limit restrictions.
+- Dependence on the structure and language used in tweets for filtering.
 
-4.4. Presentación y Almacenamiento
-RF7: Los tweets filtrados deberán ser presentados en una interfaz (puede ser una consola, una aplicación web o un reporte exportable).
-RF8: Se deberá considerar la opción de almacenar los datos en una base de datos (por ejemplo, SQLite o MongoDB) para consultas futuras.
+## 4. Functional Requirements
 
-4.5. Automatización y Ejecución Periódica
-RF9: El agente debe poder ejecutarse de forma periódica (por ejemplo, mediante cron o un job programado en la nube) para actualizar la información.
-RF10: Notificar o registrar los casos en que se superen los límites de la API o se presenten errores en la extracción de datos.
+### 4.1. Connection and Authentication
+- **FR1**: The agent must authenticate using credentials (API key, API secret, access token, access token secret) provided by Twitter Developer.
+- **FR2**: The secure storage and use of credentials must be managed appropriately.
 
-5. Requerimientos No Funcionales
-RNF1. Seguridad:
-Manejo seguro de las credenciales de la API.
-Cumplimiento de las políticas de uso de Twitter.
+### 4.2. Tweet Extraction
+- **FR3**: The system must connect to the Twitter API to extract the last **N** tweets from the specified account.
+- **FR4**: The number of tweets to extract per execution must be configurable.
 
-RNF2. Rendimiento:
-El sistema deberá responder y filtrar los tweets en un tiempo razonable (por ejemplo, en menos de 5 segundos por ejecución en condiciones normales).
+### 4.3. Filtering and Content Processing
+- **FR5**: The agent will filter tweets to identify those containing specific keywords: "cursor", "windsurf", and "advice" (considering case variations and possible synonyms).
+- **FR6**: Optionally, implement Natural Language Processing (NLP) techniques to improve accuracy in identifying advice.
 
-6. Análisis Técnico y Solución Propuesta
+### 4.4. Presentation and Storage
+- **FR7**: Filtered tweets should be presented in an interface (console, web application, or exportable report).
+- **FR8**: An option to store the data in a database (e.g., SQLite or MongoDB) should be considered for future queries.
 
-6.1 Arquitectura de Twitter y Mecanismos Anti-Scraping
-Twitter emplea una arquitectura híbrida SSR/CSR usando React.js, Redux y GraphQL. La plataforma implementa múltiples capas de protección:
+### 4.5. Automation and Periodic Execution
+- **FR9**: The agent must be able to run periodically (e.g., via cron or a scheduled cloud job) to update the information.
+- **FR10**: Notify or log cases where API limits are exceeded or data extraction errors occur.
 
-Rate Limiting:
-- 200 solicitudes/hora por IP para endpoints públicos
-- Bloqueo automático tras 5 solicitudes consecutivas en <2 segundos
+## 5. Non-Functional Requirements
 
-Fingerprinting:
-- Análisis de headers HTTP
-- Patrones de comportamiento de scroll y clics
-- Detección de cookies específicas
+### **NFR1. Security:**
+- Secure handling of API credentials.
+- Compliance with Twitter's usage policies.
 
-Desafíos Automáticos:
-- CAPTCHA hCaptcha tras 50 solicitudes exitosas
-- Redirecciones a páginas de login
+### **NFR2. Performance:**
+- The system must respond and filter tweets within a reasonable time (e.g., less than 5 seconds per execution under normal conditions).
 
-6.2 Estrategia de Implementación
-Se propone una arquitectura híbrida que combine:
+## 6. Technical Analysis and Proposed Solution
 
-1. API de Twitter para datos recientes (7 días)
-2. Web Scraping ético con las siguientes técnicas:
-   - Ingeniería inversa de APIs internas
-   - Automatización con Playwright y patrones humanos
-   - Rotación de identidades (proxies residenciales)
-3. Procesamiento local con NLP para filtrado avanzado
+### **6.1 Twitter Architecture and Anti-Scraping Mechanisms**
+Twitter employs a hybrid SSR/CSR architecture using React.js, Redux, and GraphQL. The platform implements multiple layers of protection:
 
-6.3 Pipeline de Procesamiento
-API/Scraping -> Filtro Básico -> NLP Avanzado -> Almacenamiento
-                     |               |
-                     v               v
-                 Descartar    Falso Positivo
+#### Rate Limiting:
+- 200 requests/hour per IP for public endpoints.
+- Automatic blocking after 5 consecutive requests in <2 seconds.
 
-6.4 Gestión de Rate Limits y Mitigación
-- Implementación de retroceso exponencial
-- Sistema de Fallback Multi-Capa
-- Almacenamiento caché distribuido (Redis, TTL 72h)
-- Modelo predictivo de bloqueos
+#### Fingerprinting:
+- HTTP headers analysis.
+- Scroll and click behavior patterns.
+- Detection of specific cookies.
 
-6.5 Almacenamiento
-Estructura MongoDB optimizada con indexación compuesta:
+#### Automatic Challenges:
+- hCaptcha after 50 successful requests.
+- Redirects to login pages.
+
+### **6.2 Implementation Strategy**
+A hybrid architecture is proposed combining:
+
+1. Twitter API for recent data (7 days).
+2. Ethical web scraping with the following techniques:
+   - Reverse engineering of internal APIs.
+   - Automation with Playwright and human-like patterns.
+   - Identity rotation (residential proxies).
+3. Local NLP processing for advanced filtering.
+
+### **6.3 Processing Pipeline**
+```
+API/Scraping -> Basic Filter -> Advanced NLP -> Storage
+                    |               |
+                    v               v
+                Discard         False Positive
+```
+
+### **6.4 Rate Limit Management and Mitigation**
+- Implementation of exponential backoff.
+- Multi-layer fallback system.
+- Distributed cache storage (Redis, TTL 72h).
+- Predictive blocking model.
+
+### **6.5 Storage**
+Optimized MongoDB structure with composite indexing:
 ```json
 {
   "tweet_id": "1441065146434342915",
-  "text": "Consejo para Cursor: usar snippets de código...",
+  "text": "Advice for Cursor: use code snippets...",
   "created_at": ISODate("2025-02-19T15:00:00Z"),
   "metrics": {
     "likes": 45,
@@ -106,62 +113,61 @@ Estructura MongoDB optimizada con indexación compuesta:
 }
 ```
 
-7. Estimación de Costos y Rendimiento
+## 7. Cost and Performance Estimation
 
-7.1 Costos Mensuales (USD)
-| Componente           | Básico    | Escalado   | Enterprise |
-|---------------------|-----------|------------|------------|
-| API Twitter         | $0        | $100       | $2,500+    |
-| Proxies/Scraping    | $180      | $320       | $1,000+    |
-| Almacenamiento      | $45 (S3)  | $90        | $200+      |
-| Procesamiento NLP   | $0 (CPU)  | $20 (GPU)  | $100+      |
-| Instancias EC2      | $320      | $640       | $1,500+    |
+### **7.1 Monthly Costs (USD)**
+| Component          | Basic  | Scaled | Enterprise |
+|-------------------|--------|--------|------------|
+| Twitter API      | $0     | $100   | $2,500+    |
+| Proxies/Scraping | $180   | $320   | $1,000+    |
+| Storage         | $45 (S3) | $90    | $200+      |
+| NLP Processing  | $0 (CPU) | $20 (GPU) | $100+  |
+| EC2 Instances   | $320    | $640   | $1,500+    |
 
-7.2 Métricas de Rendimiento (10,000 tweets)
-| Método             | Tiempo    | Tasa Éxito | Costo USD |
-|--------------------|-----------|------------|-----------|
-| API Twitter Free   | 4h20m     | 100%       | 0         |
-| Scraping Básico    | 2h15m     | 18%        | 85        |
-| Solución Híbrida   | 3h45m     | 89%        | 120       |
+### **7.2 Performance Metrics (10,000 tweets)**
+| Method             | Time    | Success Rate | Cost (USD) |
+|--------------------|---------|--------------|------------|
+| Twitter API Free  | 4h20m   | 100%         | 0          |
+| Basic Scraping   | 2h15m   | 18%          | 85         |
+| Hybrid Solution  | 3h45m   | 89%          | 120        |
 
-8. Consideraciones Legales
+## 8. Legal Considerations
 
-8.1 Marco Jurídico
-- Sentencia hiQ vs LinkedIn: Permite scraping de datos públicos
-- GDPR (UE): Requiere consentimiento para datos personales
-- Leyes locales: Varían por jurisdicción
+### **8.1 Legal Framework**
+- **hiQ vs LinkedIn ruling**: Allows scraping of public data.
+- **GDPR (EU)**: Requires consent for personal data.
+- **Local laws**: Vary by jurisdiction.
 
-8.2 Buenas Prácticas
-- Respetar robots.txt y límites de rate
-- Excluir datos privados y contenido sensible
-- Mantener registros de cumplimiento
+### **8.2 Best Practices**
+- Respect robots.txt and rate limits.
+- Exclude private and sensitive data.
+- Maintain compliance records.
 
-9. Conclusiones y Recomendaciones
+## 9. Conclusions and Recommendations
+The project is technically viable under the following conditions:
 
-El proyecto es técnicamente viable bajo las siguientes condiciones:
+1. **Professional Implementation**:
+   - Use of advanced scraping techniques.
+   - Identity rotation.
+   - Distributed cache system.
 
-1. Implementación Profesional:
-   - Uso de técnicas avanzadas de scraping
-   - Rotación de identidades
-   - Sistema de caché distribuido
+2. **Minimum Investment**:
+   - Initial budget: $200-$400/month.
+   - Scalable based on needs.
 
-2. Inversión Mínima:
-   - Presupuesto inicial: $200-$400/mes
-   - Escalable según necesidades
+3. **Risk Management**:
+   - Active blocking monitoring.
+   - Multi-layer fallback system.
+   - Legal and ethical compliance.
 
-3. Gestión de Riesgos:
-   - Monitorización activa de bloqueos
-   - Sistema de fallback multi-capa
-   - Cumplimiento legal y ético
+4. **Hybrid Architecture**:
+   - Official API for recent data.
+   - Ethical scraping for historical data.
+   - Distributed processing.
 
-4. Arquitectura Híbrida:
-   - API oficial para datos recientes
-   - Scraping ético para datos históricos
-   - Procesamiento distribuido
+**Main Risks:**
+- Changes in Twitter's UI (2-3 updates/month).
+- Variable operational costs.
+- Legal considerations by jurisdiction.
 
-Riesgos Principales:
-- Cambios en la UI de Twitter (2-3 actualizaciones/mes)
-- Costos operativos variables
-- Consideraciones legales por jurisdicción
-
-Se recomienda comenzar con una implementación básica y escalar gradualmente según los resultados y necesidades del proyecto.
+It is recommended to start with a basic implementation and gradually scale based on project results and needs.
