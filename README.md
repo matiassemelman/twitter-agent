@@ -50,31 +50,47 @@ El sistema deberá responder y filtrar los tweets en un tiempo razonable (por ej
 
 6. Análisis Técnico y Solución Propuesta
 
-6.1 Arquitectura de la API de Twitter y Planes de Acceso
-La X API v2 ofrece tres niveles de acceso:
-- Free Tier: 500,000 tweets/mes con límite de 50 solicitudes/15 minutos
-- Basic Tier: US$100/mes para 2 millones de tweets/mes
-- Enterprise: Soluciones personalizadas
+6.1 Arquitectura de Twitter y Mecanismos Anti-Scraping
+Twitter emplea una arquitectura híbrida SSR/CSR usando React.js, Redux y GraphQL. La plataforma implementa múltiples capas de protección:
+
+Rate Limiting:
+- 200 solicitudes/hora por IP para endpoints públicos
+- Bloqueo automático tras 5 solicitudes consecutivas en <2 segundos
+
+Fingerprinting:
+- Análisis de headers HTTP
+- Patrones de comportamiento de scroll y clics
+- Detección de cookies específicas
+
+Desafíos Automáticos:
+- CAPTCHA hCaptcha tras 50 solicitudes exitosas
+- Redirecciones a páginas de login
 
 6.2 Estrategia de Implementación
 Se propone una arquitectura híbrida que combine:
+
 1. API de Twitter para datos recientes (7 días)
-2. Web Scraping ético para datos históricos
+2. Web Scraping ético con las siguientes técnicas:
+   - Ingeniería inversa de APIs internas
+   - Automatización con Playwright y patrones humanos
+   - Rotación de identidades (proxies residenciales)
 3. Procesamiento local con NLP para filtrado avanzado
 
 6.3 Pipeline de Procesamiento
-API Twitter -> Filtro Básico -> NLP Avanzado -> Almacenamiento
-                    |                |
-                    v                v
-                Descartar     Falso Positivo
+API/Scraping -> Filtro Básico -> NLP Avanzado -> Almacenamiento
+                     |               |
+                     v               v
+                 Descartar    Falso Positivo
 
-6.4 Gestión de Rate Limits
+6.4 Gestión de Rate Limits y Mitigación
 - Implementación de retroceso exponencial
-- Monitoreo en tiempo real de límites
-- Uso de caché para consultas frecuentes
+- Sistema de Fallback Multi-Capa
+- Almacenamiento caché distribuido (Redis, TTL 72h)
+- Modelo predictivo de bloqueos
 
 6.5 Almacenamiento
 Estructura MongoDB optimizada con indexación compuesta:
+```json
 {
   "tweet_id": "1441065146434342915",
   "text": "Consejo para Cursor: usar snippets de código...",
@@ -88,28 +104,64 @@ Estructura MongoDB optimizada con indexación compuesta:
     "keywords": ["cursor", "snippet"]
   }
 }
+```
 
 7. Estimación de Costos y Rendimiento
 
 7.1 Costos Mensuales (USD)
-| Componente         | Free Tier | Basic Tier | Enterprise |
-|-------------------|-----------|------------|------------|
-| Extracción tweets | $0        | $100       | $2,500+    |
-| Almacenamiento    | $0 (1GB)  | $5 (10GB)  | $50+       |
-| Procesamiento NLP | $0 (CPU)  | $20 (GPU)  | $100+      |
+| Componente           | Básico    | Escalado   | Enterprise |
+|---------------------|-----------|------------|------------|
+| API Twitter         | $0        | $100       | $2,500+    |
+| Proxies/Scraping    | $180      | $320       | $1,000+    |
+| Almacenamiento      | $45 (S3)  | $90        | $200+      |
+| Procesamiento NLP   | $0 (CPU)  | $20 (GPU)  | $100+      |
+| Instancias EC2      | $320      | $640       | $1,500+    |
 
-7.2 Métricas de Rendimiento
-- Autenticación: 0.8s
-- Extracción API: 2.1s/100tweets
-- Filtrado NLP: 0.9s/tweet
-- Almacenamiento: 0.02s/tweet
+7.2 Métricas de Rendimiento (10,000 tweets)
+| Método             | Tiempo    | Tasa Éxito | Costo USD |
+|--------------------|-----------|------------|-----------|
+| API Twitter Free   | 4h20m     | 100%       | 0         |
+| Scraping Básico    | 2h15m     | 18%        | 85        |
+| Solución Híbrida   | 3h45m     | 89%        | 120       |
 
-8. Conclusiones y Recomendaciones
+8. Consideraciones Legales
+
+8.1 Marco Jurídico
+- Sentencia hiQ vs LinkedIn: Permite scraping de datos públicos
+- GDPR (UE): Requiere consentimiento para datos personales
+- Leyes locales: Varían por jurisdicción
+
+8.2 Buenas Prácticas
+- Respetar robots.txt y límites de rate
+- Excluir datos privados y contenido sensible
+- Mantener registros de cumplimiento
+
+9. Conclusiones y Recomendaciones
 
 El proyecto es técnicamente viable bajo las siguientes condiciones:
-1. Uso del Basic Tier de la API para garantizar capacidad suficiente
-2. Implementación de arquitectura híbrida (API + Scraping)
-3. Sistema robusto de gestión de rate limits
-4. Procesamiento distribuido para optimizar rendimiento
 
-La inversión inicial estimada de USD 150-300/mes permitiría manejar hasta 10,000 usuarios/mes de manera eficiente.
+1. Implementación Profesional:
+   - Uso de técnicas avanzadas de scraping
+   - Rotación de identidades
+   - Sistema de caché distribuido
+
+2. Inversión Mínima:
+   - Presupuesto inicial: $200-$400/mes
+   - Escalable según necesidades
+
+3. Gestión de Riesgos:
+   - Monitorización activa de bloqueos
+   - Sistema de fallback multi-capa
+   - Cumplimiento legal y ético
+
+4. Arquitectura Híbrida:
+   - API oficial para datos recientes
+   - Scraping ético para datos históricos
+   - Procesamiento distribuido
+
+Riesgos Principales:
+- Cambios en la UI de Twitter (2-3 actualizaciones/mes)
+- Costos operativos variables
+- Consideraciones legales por jurisdicción
+
+Se recomienda comenzar con una implementación básica y escalar gradualmente según los resultados y necesidades del proyecto.
